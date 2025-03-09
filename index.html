@@ -90,7 +90,6 @@
     { name: "Barium", symbol: "Ba", group: "2A", atomicNumber: 56, atomicWeight: 137.327, density: 3.51, meltingPoint: 727, boilingPoint: 1897 },
     { name: "Radium", symbol: "Ra", group: "2A", atomicNumber: 88, atomicWeight: 226, density: 5.5, meltingPoint: 700, boilingPoint: 1737 },
     
-    { name: "Boron", symbol: "B",group:"3A", atomicNumber: 5, atomicWeight:10, density:2.34, meltingPoint:2076, boilingPoint:3927 },  
     { name: "Aluminium", symbol: "Al",group:"3A", atomicNumber: 13, atomicWeight:27, density:2.70, meltingPoint:660.32, boilingPoint:2519},
     { name: "Gallium", symbol: "Ga",group:"3A", atomicNumber:31, atomicWeight:69, density:5.91, meltingPoint:29.76, boilingPoint:2204},
     { name: "Indium", symbol: "In",group:"3A", atomicNumber: 49, atomicWeight:114.8, density:7.31, meltingPoint:156.60, boilingPoint:2072},  
@@ -136,29 +135,46 @@
 
         // ฟังก์ชันค้นหาธาตุ
         function searchElement() {
-            const query = document.getElementById("searchInput").value.trim().toLowerCase();
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ""; 
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = ""; 
 
-            if (query === "") return;
+    console.log("Query:", query); // เช็กค่าที่พิมพ์เข้ามา
 
-            const element = elements.find(e => e.name.toLowerCase() === query || e.symbol.toLowerCase() === query);
+    if (query === "") {
+        console.log("ไม่มีคำค้นหา");
+        return; 
+    }
 
-            if (!element) {
-                resultDiv.innerHTML = "<p>ไม่พบข้อมูลธาตุที่ค้นหา</p>";
-            } else {
-                resultDiv.innerHTML = `
-                <p><strong>ชื่อ:</strong> ${element.name}<br>
-                <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
-                <strong>หมู่:</strong> ${element.group}<br>
-                <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
-                <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
-                <strong>จุดหลอมเหลว:</strong> ${element.meltingPoint ?? "ไม่มี"} °C<br>
-                <strong>จุดเดือด:</strong> ${element.boilingPoint ?? "ไม่มี"} °C
-                </p>
-                `;
-            }
-        }
+    const filteredElements = elements.filter(element => 
+    element.name?.toLowerCase() === query || element.symbol?.toLowerCase() === query
+);
+
+
+console.log("Elements Data:", elements);
+
+
+    if (filteredElements.length === 0) {
+        resultDiv.innerHTML = "<p> ไม่พบข้อมูลธาตุที่ค้นหา</p>"; 
+        console.log("ไม่พบข้อมูลธาตุ");
+        return;
+    }
+
+    // แสดงผลลัพธ์
+    const element = filteredElements[0]; 
+    resultDiv.innerHTML = `
+        <p><strong>ชื่อ:</strong> ${element.name}<br>
+           <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
+           <strong>หมู่:</strong> ${element.group}<br>
+           <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
+           <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
+           <strong>จุดหลอมเหลว:</strong> ${element.meltingPoint ?? "ไม่มีข้อมูล"} °C<br>
+           <strong>จุดเดือด:</strong> ${element.boilingPoint ?? "ไม่มีข้อมูล"} °C
+        </p>
+    `;
+}
+
+
 
         // ฟังก์ชั่นค้นหาธาตุจากชื่อหรือสัญลักษณ์
         function findElement(input) {
@@ -201,8 +217,5 @@
         // แสดงหน้าค้นหาเริ่มต้น
         document.getElementById("searchSection").style.display = "block";
     </script>
-</body>
-</html>
-
 </body>
 </html>
