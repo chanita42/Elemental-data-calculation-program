@@ -134,41 +134,37 @@
             { name: "Oganesson", symbol: "Og",grop:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"}
         ];
         // ฟังก์ชั่นค้นหาธาตุ  
-      function searchElement() {
-            const query = document.getElementById("searchInput").value.trim().toLowerCase();
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ""; 
+     function searchElement() {
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = ""; 
 
+    if (query === "") {
+        resultDiv.innerHTML = "<p>กรุณาป้อนชื่อหรือสัญลักษณ์ของธาตุ</p>";
+        return;
+    }
 
-);
-            // ตรวจสอบว่า query มีข้อมูลหรือไม่
-            if (query === "") {
-                return; // ถ้าไม่มีคำค้นหาจะไม่แสดงผลลัพธ์
-            }
+    // ใช้ฟังก์ชัน findElement แทน filter
+    const element = findElement(query);
+    
+    if (!element) {
+        resultDiv.innerHTML = "<p>ไม่พบข้อมูลธาตุที่ค้นหา</p>";
+        return;
+    }
 
-            // ค้นหาธาตุที่มีชื่อหรือสัญลักษณ์ตรงกับคำค้นหาที่ใส่ไป
-            const filteredElements = elements.filter(element => 
-                element.name.toLowerCase() === query || element.symbol.toLowerCase() === query
-            );
-            if (filteredElements.length === 0) {
-                resultDiv.innerHTML = "<p>ไม่พบข้อมูลธาตุที่ค้นหา</p>";
-            } else {
-                filteredElements.forEach(element => {
-                    const resultHTML = `
-                        <p><strong>ชื่อ:</strong> ${element.name}<br>
-                           <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
-                           <strong>หมู่:</strong> ${element.group}<br>
-                           <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
-                           <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
-                           <strong>ความหนาแน่น:</strong> ${element.density} g/cm³<br>
-                           <strong>จุดหลอมละลาย:</strong> ${element.meltingPoint} °C<br>
-                           <strong>จุดเดือด:</strong> ${element.boilingPoint} °C
-                        </p>
-                    `;
-                    resultDiv.innerHTML += resultHTML;
-                });
-            }
-        }
+    const resultHTML = `
+        <p><strong>ชื่อ:</strong> ${element.name}<br>
+           <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
+           <strong>หมู่:</strong> ${element.group}<br>
+           <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
+           <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
+           <strong>ความหนาแน่น:</strong> ${element.density} g/cm³<br>
+           <strong>จุดหลอมละลาย:</strong> ${element.meltingPoint} °C<br>
+           <strong>จุดเดือด:</strong> ${element.boilingPoint} °C
+        </p>
+    `;
+    resultDiv.innerHTML = resultHTML;
+}
         // ฟังก์ชั้นการคำนวณมวลจากโมล
         function calculateMass() {
             const elementInput = document.getElementById("elementInput").value.trim();
