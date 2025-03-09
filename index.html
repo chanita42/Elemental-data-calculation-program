@@ -131,11 +131,16 @@
             { name: "Krypton", symbol: "Kr",grop: "8A",atomicNumber:36, atomicWeight:83.798, density:3.749, meltingPoint:-157.36, boilingPoint:-153.22},
             { name: "Xenon", symbol: "Xe",grop:"8A",atomicNumber:54, atomicWeight:131.293, density:5.894, meltingPoint:-111.7, boilingPoint:-108.12},
             { name: "Radon",Symbol: "Rn",grop: "8A",atomicNumber:86, atomicWeight:222, density:0.00973, meltingPoint:-71.15, boilingPoint:-61.85},
-            { name: "Oganesson", symbol: "Og",grop:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"},
+            { name: "Oganesson", symbol: "Og",grop:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"}
         ];
         // ฟังก์ชั่นค้นหาธาตุ  
-        const filteredElements = elements.filter(element => 
-    element.name.toLowerCase().includes(query) || element.symbol.toLowerCase().includes(query)
+      def search_element():
+    name = entry.get().capitalize() 
+    if name in elements:
+        result_label.config(text=f"{name}: {elements[name]}")
+    else:
+        result_label.config(text="ไม่พบธาตุที่ค้นหา")
+
 );
             // ตรวจสอบว่า query มีข้อมูลหรือไม่
             if (query === "") {
