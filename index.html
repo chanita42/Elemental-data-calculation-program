@@ -18,14 +18,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"] {
-            width: 100%;
-            padding: 5px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        input[type="number"] {
+        input[type="text"], input[type="number"] {
             width: 100%;
             padding: 5px;
             margin: 10px 0;
@@ -55,9 +48,6 @@
         #calculatorSection, #searchSection {
             display: none;
         }
-        #massResult {
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
@@ -72,100 +62,110 @@
     <div id="calculatorSection" class="container" style="display:none;">
         <h1>คำนวณข้อมูลธาตุ</h1> 
         <p><strong>กรุณากรอกชื่อธาตุ:</strong></p>
-        <input type="text" id="elementInput" placeholder="ป้อนชื่อหรือสัญลักษณ์ของธาตุ..." onkeyup="checkElement()">
+        <input type="text" id="elementInput" placeholder="ป้อนชื่อหรือสัญลักษณ์ของธาตุ...">
         <input type="number" id="moles" placeholder="จำนวนโมล" min="0" step="any">
-        <div id="massResult"class="result"></div>
+        <div id="massResult" class="result"></div>
         <button onclick="calculateMass()">คำนวณ</button>
         <button onclick="goBack()">กลับไปที่หน้าค้นหาธาตุ</button>
     </div>
-
-    <script>
-        // ข้อมูลธาตุ
-        const elements = [
-            { name: "Hydrogen", symbol: "H",group:"1A", atomicNumber: 1, atomicWeight: 1.008, density: 0.08988, meltingPoint: -259.16, boilingPoint: -252.87 },
-            { name: "Helium", symbol: "He",group:"8A", atomicNumber: 2, atomicWeight: 4.0026, density: 0.1786, meltingPoint: -272.2, boilingPoint: -268.93 },
-            { name: "Carbon", symbol: "C",group:"4A", atomicNumber: 6, atomicWeight: 12.011, density: 2.267, meltingPoint: 3550, boilingPoint: 4827 },
-            { name: "Oxygen", symbol: "O",group:"6A", atomicNumber: 8, atomicWeight: 15.999, density: 0.001429, meltingPoint: -218.79, boilingPoint: -182.96 },
-            { name: "Lithuim", symbol: "Li",group:"1A", atomicNumber: 3, atomicWeight:6.94, density: 0.534, meltingPoint:180.50, boilingPoint: 1342 },
-            { name: "Sodium", symbol: "Na",group:"1A", atomicNumber: 11, atomicWeight:23, density: 0.968, meltingPoint:97.794, boilingPoint:882.940 },
-            { name: "Potassium", symbol: "K",group:"1A", atomicNumber: 19, atomicWeight: 39, density:0.862, meltingPoint:63.5, boilingPoint: 759 },
-            { name: "Rubiduim", symbol: "Rb",group:"1A", atomicNumber: 37, atomicWeight: 85, density:1.532, meltingPoint: 39.31, boilingPoint: 688 },
-            { name: "Cesium", symbol: "Cs",group:"1A", atomicNumber: 55, atomicWeight:132, density: 1.93, meltingPoint:28.44, boilingPoint:671},
-            { name: "Fransuim", symbol: "Fr",group:"1A", atomicNumber: 87, atomicWeight: 223, density:1.87, meltingPoint:27, boilingPoint: 677 },
-            { name: "Beryluim", symbol: "Be",group:"2A", atomicNumber: 4, atomicWeight:9.00 , density:1.85, meltingPoint: 1287, boilingPoint: 2468 },
-            { name: "Magnesuim", symbol: "Mg",group:"2A", atomicNumber: 12, atomicWeight:24, density: 1.738, meltingPoint:650, boilingPoint:1090},
-            { name: "Calsium", symbol: "Ca",group:"2A", atomicNumber:20, atomicWeight: 40, density:1.55, meltingPoint:842, boilingPoint: 1484 },
-            { name: "Strontium", symbol: "Sr",group:"2A", atomicNumber: 38, atomicWeight:87, density:2.64, meltingPoint: 777, boilingPoint: 1377 },
-            { name: "Barium", symbol: "Ba",grop:"2A", atomicNumber: 56, atomicWeight:137, density: 3.51, meltingPoint:727, boilingPoint:1897},
-            { name: "Radium", symbol: "Ra",grop:"2A", atomicNumber:88, atomicWeight:226, density:5.5, meltingPoint:700, boilingPoint:1737 },
-            { name: "Boron", symbol: "B",grop:"3A", atomicNumber: 5, atomicWeight:10, density:2.34, meltingPoint:2076, boilingPoint:3927 },  
-            { name: "Aluminium", symbol: "Al",grop:"3A", atomicNumber: 13, atomicWeight:27, density:2.70, meltingPoint:660.32, boilingPoint:2519},
-            { name: "Gallium", symbol: "Ga",grop:"3A", atomicNumber:31, atomicWeight:69, density:5.91, meltingPoint:29.76, boilingPoint:2204},
-            { name: "Indium", symbol: "In",grop:"3A", atomicNumber: 49, atomicWeight:114.8, density:7.31, meltingPoint:156.60, boilingPoint:2072},  
-            { name: "Tallium", symbol: "Tl",grop:"3A", atomicNumber: 81, atomicWeight:204.38, density:11.85, meltingPoint:304, boilingPoint:1473},
-            { name: "Nihonium", symbol: "Nh",grop:"4A", atomicNumber:113, atomicWeight:286, density:16, meltingPoint:430, boilingPoint:1130},
-            { name: "Silicon", symbol: "Si",grop:"4A", atomicNumber: 14, atomicWeight:28.08, density:2.33, meltingPoint:1414, boilingPoint:3265 },  
-            { name: "Germanium", symbol: "Ge",grop:"4A", atomicNumber: 32, atomicWeight:72.61, density:5.32, meltingPoint:938.25, boilingPoint:2833},
-            { name: "Tin", symbol: "Sn",grop:"4A", atomicNumber:50, atomicWeight:118.7, density:7.265, meltingPoint:231.93, boilingPoint:2602},
-            { name: "Lead", symbol: "Pb",grop:"4A", atomicNumber: 82, atomicWeight:207, density:11.34, meltingPoint:327.46, boilingPoint:1749 },  
-            { name: "Flerovium", symbol: "Fl",grop:"4A", atomicNumber: 114, atomicWeight:289, density:14, meltingPoint:70, boilingPoint:150},
-            { name: "Nitrogen", symbol: "N",grop:"5A", atomicNumber:7, atomicWeight:14.01, density:1.251, meltingPoint:-210.00, boilingPoint:-195.79},
-            { name: "Phosphorus", symbol: "P",grop:"5A", atomicNumber:15, atomicWeight:30.97, density:1.83, meltingPoint:44, boilingPoint:280},  
-            { name: "Arsenic", symbol: "As",grop:"5A", atomicNumber: 33, atomicWeight:75, density:5.73, meltingPoint:817, boilingPoint:614},
-            { name: "Antimony", symbol: "Sb",grop:"5A", atomicNumber:51, atomicWeight:121.76, density:6.697, meltingPoint:630.63, boilingPoint:1587},
-            { name: "Bismuth", symbol: "Bi",grop:"5A", atomicNumber:83, atomicWeight:209, density:9.78, meltingPoint:271.5, boilingPoint:1564},  
-            { name: "Moscovium", symbol: "Mc",grop:"5A", atomicNumber: 115, atomicWeight:288, density:"ไม่มี", meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"},
-            { name: "Sulfur", symbol: "S",grop: "6A",atomicNumber:16, atomicWeight:32, density:2.067, meltingPoint:115.21, boilingPoint:444.65},
-            { name: "Selenium", symbol: "Se",grop: "6A",atomicNumber:34, atomicWeight:78.96, density:4.809, meltingPoint:221, boilingPoint:685},
-            { name: "Tellurium", symbol: "Te",grop: "6A",atomicNumber:52, atomicWeight:127.60, density:6.24, meltingPoint:449.51, boilingPoint:988},
-            { name: "Polonium", symbol: "Po",grop: "6A",atomicNumber:84, atomicWeight:209, density:9.196, meltingPoint:254, boilingPoint:962},
-            { name: "Livermorium", symbol: "Lv",grop: "6A",atomicNumber:116, atomicWeight:292, density:"ไม่มี", meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"},
-            { name: "Fluorine", symbol: "F",grop:"7A", atomicNumber:9, atomicWeight:19, density:1.696, meltingPoint:-219.67, boilingPoint:-188.11},
-            { name: "Chlorine", symbol: "Cl",grop:"7A",atomicNumber:17, atomicWeight:35.453, density:0.003214, meltingPoint:-101.5, boilingPoint:-34.04},
-            { name: "Bromine", symbol: "Br",grop: "7A",atomicNumber:35, atomicWeight:79.904, density:3.1028, meltingPoint:-7.3, boilingPoint:58.8},
-            { name: "Iodine", symbol: "I",grop:"7A",atomicNumber:53, atomicWeight:126.90, density:4.93, meltingPoint:113.7, boilingPoint:184.25},
-            { name: "Astatine",Symbol: "At",grop: "7A",atomicNumber:85, atomicWeight:210, density:7.00, meltingPoint:302, boilingPoint:337},
-            { name: "Tennessine", symbol: "Ts",grop:"7A",atomicNumber:117, atomicWeight:294, density:"ไม่มี", meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"},
-            { name: "Neon", symbol: "Ne",grop:"8A", atomicNumber:10, atomicWeight:20, density:0.9002, meltingPoint:-248.59, boilingPoint:-246.046},
-            { name: "Argon", symbol: "Ar",grop: "8A",atomicNumber:18, atomicWeight:39.948, density:0.0017837, meltingPoint:-189.35, boilingPoint:-185.85},
-            { name: "Krypton", symbol: "Kr",grop: "8A",atomicNumber:36, atomicWeight:83.798, density:3.749, meltingPoint:-157.36, boilingPoint:-153.22},
-            { name: "Xenon", symbol: "Xe",grop:"8A",atomicNumber:54, atomicWeight:131.293, density:5.894, meltingPoint:-111.7, boilingPoint:-108.12},
-            { name: "Radon",Symbol: "Rn",grop: "8A",atomicNumber:86, atomicWeight:222, density:0.00973, meltingPoint:-71.15, boilingPoint:-61.85},
-            { name: "Oganesson", symbol: "Og",grop:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"}
-        ];
-        // ฟังก์ชั่นค้นหาธาตุ  
-     function searchElement() {
-    const query = document.getElementById("searchInput").value.trim().toLowerCase();
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = ""; 
-
-    if (query === "") {
-        resultDiv.innerHTML = "<p>กรุณาป้อนชื่อหรือสัญลักษณ์ของธาตุ</p>";
-        return;
-    }
-
-    // ใช้ฟังก์ชัน findElement แทน filter
-    const element = findElement(query);
     
-    if (!element) {
-        resultDiv.innerHTML = "<p>ไม่พบข้อมูลธาตุที่ค้นหา</p>";
-        return;
-    }
+    <script>
+        // ข้อมูลธาตุ (ตัวอย่าง)
+        const elements = [
+    { name: "Hydrogen", symbol: "H", group: "1A", atomicNumber: 1, atomicWeight: 1.008, density: 0.08988, meltingPoint: -259.16, boilingPoint: -252.87 },
+    { name: "Helium", symbol: "He", group: "8A", atomicNumber: 2, atomicWeight: 4.0026, density: 0.1786, meltingPoint: -272.2, boilingPoint: -268.93 },
+    { name: "Carbon", symbol: "C", group: "4A", atomicNumber: 6, atomicWeight: 12.011, density: 2.267, meltingPoint: 3550, boilingPoint: 4827 },
+    { name: "Oxygen", symbol: "O", group: "6A", atomicNumber: 8, atomicWeight: 15.999, density: 0.001429, meltingPoint: -218.79, boilingPoint: -182.96 },
+    { name: "Lithium", symbol: "Li", group: "1A", atomicNumber: 3, atomicWeight: 6.94, density: 0.534, meltingPoint: 180.50, boilingPoint: 1342 },
+    { name: "Sodium", symbol: "Na", group: "1A", atomicNumber: 11, atomicWeight: 23, density: 0.968, meltingPoint: 97.794, boilingPoint: 882.940 },
+    { name: "Potassium", symbol: "K", group: "1A", atomicNumber: 19, atomicWeight: 39.098, density: 0.862, meltingPoint: 63.5, boilingPoint: 759 },
+    { name: "Rubidium", symbol: "Rb", group: "1A", atomicNumber: 37, atomicWeight: 85.468, density: 1.532, meltingPoint: 39.31, boilingPoint: 688 },
+    { name: "Cesium", symbol: "Cs", group: "1A", atomicNumber: 55, atomicWeight: 132.905, density: 1.93, meltingPoint: 28.44, boilingPoint: 671 },
+    { name: "Francium", symbol: "Fr", group: "1A", atomicNumber: 87, atomicWeight: 223, density: 1.87, meltingPoint: 27, boilingPoint: 677 },
+    
+    { name: "Beryllium", symbol: "Be", group: "2A", atomicNumber: 4, atomicWeight: 9.0122, density: 1.85, meltingPoint: 1287, boilingPoint: 2468 },
+    { name: "Magnesium", symbol: "Mg", group: "2A", atomicNumber: 12, atomicWeight: 24.305, density: 1.738, meltingPoint: 650, boilingPoint: 1090 },
+    { name: "Calcium", symbol: "Ca", group: "2A", atomicNumber: 20, atomicWeight: 40.078, density: 1.55, meltingPoint: 842, boilingPoint: 1484 },
+    { name: "Strontium", symbol: "Sr", group: "2A", atomicNumber: 38, atomicWeight: 87.62, density: 2.64, meltingPoint: 777, boilingPoint: 1377 },
+    { name: "Barium", symbol: "Ba", group: "2A", atomicNumber: 56, atomicWeight: 137.327, density: 3.51, meltingPoint: 727, boilingPoint: 1897 },
+    { name: "Radium", symbol: "Ra", group: "2A", atomicNumber: 88, atomicWeight: 226, density: 5.5, meltingPoint: 700, boilingPoint: 1737 },
+    
+    { name: "Boron", symbol: "B",group:"3A", atomicNumber: 5, atomicWeight:10, density:2.34, meltingPoint:2076, boilingPoint:3927 },  
+    { name: "Aluminium", symbol: "Al",group:"3A", atomicNumber: 13, atomicWeight:27, density:2.70, meltingPoint:660.32, boilingPoint:2519},
+    { name: "Gallium", symbol: "Ga",group:"3A", atomicNumber:31, atomicWeight:69, density:5.91, meltingPoint:29.76, boilingPoint:2204},
+    { name: "Indium", symbol: "In",group:"3A", atomicNumber: 49, atomicWeight:114.8, density:7.31, meltingPoint:156.60, boilingPoint:2072},  
+    { name: "Tallium", symbol: "Tl",group:"3A", atomicNumber: 81, atomicWeight:204.38, density:11.85, meltingPoint:304, boilingPoint:1473},
+    
+    { name: "Nihonium", symbol: "Nh",group:"4A", atomicNumber:113, atomicWeight:286, density:16, meltingPoint:430, boilingPoint:1130},
+    { name: "Silicon", symbol: "Si",group:"4A", atomicNumber: 14, atomicWeight:28.08, density:2.33, meltingPoint:1414, boilingPoint:3265 },  
+    { name: "Germanium", symbol: "Ge",group:"4A", atomicNumber: 32, atomicWeight:72.61, density:5.32, meltingPoint:938.25, boilingPoint:2833},
+    { name: "Tin", symbol: "Sn",group:"4A", atomicNumber:50, atomicWeight:118.7, density:7.265, meltingPoint:231.93, boilingPoint:2602},
+    { name: "Lead", symbol: "Pb",group:"4A", atomicNumber: 82, atomicWeight:207, density:11.34, meltingPoint:327.46, boilingPoint:1749 },  
+    { name: "Flerovium", symbol: "Fl",group:"4A", atomicNumber: 114, atomicWeight:289, density:14, meltingPoint:70, boilingPoint:150},
 
-    const resultHTML = `
-        <p><strong>ชื่อ:</strong> ${element.name}<br>
-           <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
-           <strong>หมู่:</strong> ${element.group}<br>
-           <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
-           <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
-           <strong>ความหนาแน่น:</strong> ${element.density} g/cm³<br>
-           <strong>จุดหลอมละลาย:</strong> ${element.meltingPoint} °C<br>
-           <strong>จุดเดือด:</strong> ${element.boilingPoint} °C
-        </p>
-    `;
-    resultDiv.innerHTML = resultHTML;
-}
-        // ฟังก์ชั้นการคำนวณมวลจากโมล
+    { name: "Nitrogen", symbol: "N", group: "5A", atomicNumber: 7, atomicWeight: 14.007, density: 1.251, meltingPoint: -210.00, boilingPoint: -195.79 },
+    { name: "Phosphorus", symbol: "P", group: "5A", atomicNumber: 15, atomicWeight: 30.974, density: 1.83, meltingPoint: 44, boilingPoint: 280 },
+    { name: "Arsenic", symbol: "As", group: "5A", atomicNumber: 33, atomicWeight: 74.922, density: 5.73, meltingPoint: 817, boilingPoint: 614 },
+    { name: "Antimony", symbol: "Sb", group: "5A", atomicNumber: 51, atomicWeight: 121.760, density: 6.697, meltingPoint: 630.63, boilingPoint: 1587 },
+    { name: "Bismuth", symbol: "Bi", group: "5A", atomicNumber: 83, atomicWeight: 208.980, density: 9.78, meltingPoint: 271.5, boilingPoint: 1564 },
+    { name: "Moscovium", symbol: "Mc",group:"5A", atomicNumber: 115, atomicWeight:288, density:null, meltingPoint:null, boilingPoint:null},
+    
+
+    { name: "Sulfur", symbol: "S", group: "6A", atomicNumber: 16, atomicWeight: 32.06, density: 2.067, meltingPoint: 115.21, boilingPoint: 444.65 },
+    { name: "Selenium", symbol: "Se", group: "6A", atomicNumber: 34, atomicWeight: 78.96, density: 4.809, meltingPoint: 221, boilingPoint: 685 },
+    { name: "Tellurium", symbol: "Te", group: "6A", atomicNumber: 52, atomicWeight: 127.60, density: 6.24, meltingPoint: 449.51, boilingPoint: 988 },
+    { name: "Polonium", symbol: "Po",group: "6A",atomicNumber:84, atomicWeight:209, density:9.196, meltingPoint:254, boilingPoint:962},
+    { name: "Livermorium", symbol: "Lv",group: "6A",atomicNumber:116, atomicWeight:292, density:null, meltingPoint:null, boilingPoint:null},
+
+
+    { name: "Fluorine", symbol: "F", group: "7A", atomicNumber: 9, atomicWeight: 18.998, density: 1.696, meltingPoint: -219.67, boilingPoint: -188.11 },
+    { name: "Chlorine", symbol: "Cl", group: "7A", atomicNumber: 17, atomicWeight: 35.45, density: 0.003214, meltingPoint: -101.5, boilingPoint: -34.04 },
+    { name: "Bromine", symbol: "Br", group: "7A", atomicNumber: 35, atomicWeight: 79.904, density: 3.122, meltingPoint: -7.3, boilingPoint: 58.8 },
+    { name: "Iodine", symbol: "I", group: "7A", atomicNumber: 53, atomicWeight: 126.90, density: 4.93, meltingPoint: 113.7, boilingPoint: 184.25 },
+    { name: "Astatine",Symbol: "At",grop: "7A",atomicNumber:85, atomicWeight:210, density:7.00, meltingPoint:302, boilingPoint:337},
+    { name: "Tennessine", symbol: "Ts",group:"7A",atomicNumber:117, atomicWeight:294, density:null, meltingPoint:null, boilingPoint:null},
+
+    { name: "Neon", symbol: "Ne", group: "8A", atomicNumber: 10, atomicWeight: 20.180, density: 0.9002, meltingPoint: -248.59, boilingPoint: -246.046 },
+    { name: "Argon", symbol: "Ar", group: "8A", atomicNumber: 18, atomicWeight: 39.948, density: 0.0017837, meltingPoint: -189.35, boilingPoint: -185.85 },
+    { name: "Krypton", symbol: "Kr", group: "8A", atomicNumber: 36, atomicWeight: 83.798, density: 3.749, meltingPoint: -157.36, boilingPoint: -153.22 },
+    { name: "Xenon", symbol: "Xe", group: "8A", atomicNumber: 54, atomicWeight: 131.293, density: 5.894, meltingPoint: -111.7, boilingPoint: -108.12 },
+    { name: "Radon", symbol: "Rn", group: "8A", atomicNumber: 86, atomicWeight: 222, density: 0.00973, meltingPoint: -71.15, boilingPoint: -61.85 },
+    { name: "Oganesson", symbol: "Og",group:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:null, boilingPoint:null},
+
+];
+
+        // ฟังก์ชันค้นหาธาตุ
+        function searchElement() {
+            const query = document.getElementById("searchInput").value.trim().toLowerCase();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = ""; 
+
+            if (query === "") return;
+
+            const element = elements.find(e => e.name.toLowerCase() === query || e.symbol.toLowerCase() === query);
+
+            if (!element) {
+                resultDiv.innerHTML = "<p>ไม่พบข้อมูลธาตุที่ค้นหา</p>";
+            } else {
+                resultDiv.innerHTML = `
+                <p><strong>ชื่อ:</strong> ${element.name}<br>
+                <strong>สัญลักษณ์:</strong> ${element.symbol}<br>
+                <strong>หมู่:</strong> ${element.group}<br>
+                <strong>หมายเลขอะตอม:</strong> ${element.atomicNumber}<br>
+                <strong>มวลอะตอม:</strong> ${element.atomicWeight}<br>
+                <strong>จุดหลอมเหลว:</strong> ${element.meltingPoint ?? "ไม่มี"} °C<br>
+                <strong>จุดเดือด:</strong> ${element.boilingPoint ?? "ไม่มี"} °C
+                </p>
+                `;
+            }
+        }
+
+        // ฟังก์ชั่นค้นหาธาตุจากชื่อหรือสัญลักษณ์
+        function findElement(input) {
+            return elements.find(e => e.name.toLowerCase() === input.toLowerCase() || e.symbol.toLowerCase() === input.toLowerCase());
+        }
+
+        // ฟังก์ชันคำนวณมวลจากโมล
         function calculateMass() {
             const elementInput = document.getElementById("elementInput").value.trim();
             const moles = parseFloat(document.getElementById("moles").value);
@@ -183,60 +183,26 @@
             }
 
             const mass = element.atomicWeight * moles;
-            massResultDiv.innerHTML = `
-                <p>มวลของ ${element.name} (${element.symbol}) ใน ${moles} โมล คือ ${mass} กรัม</p>
-            `;
-        }
-        
-         // ฟังก์ชั่นค้นหาธาตุจากชื่อหรือสัญลักษณ์
-         function findElement(input) {
-            // ค้นหาจากชื่อธาตุหรือสัญลักษณ์
-            return elements.find(element => 
-                element.name.toLowerCase() === input.toLowerCase() || 
-                element.symbol.toLowerCase() === input.toLowerCase()
-            );
-        }
-        // ฟังก์ชั่นตรวจสอบชื่อธาตุ
-        function checkElement() {
-            const elementInput = document.getElementById("elementInput").value.trim();
-            if (elementInput !== "") {
-                const element = findElement(elementInput);
-                if (element) {
-                    // หากพบธาตุที่ตรงกัน
-                    document.getElementById("massResult").innerHTML = ""; // ลบข้อความผลลัพธ์ก่อนหน้า
-                } else {
-                    document.getElementById("massResult").innerHTML = "<p>ธาตุที่กรอกไม่มีอยู่ในรายการ</p>";
-                }
-            }
+            massResultDiv.innerHTML = `<p>มวลของ ${element.name} (${element.symbol}) ใน ${moles} โมล คือ ${mass} กรัม</p>`;
         }
 
         // ฟังก์ชั่นเพื่อไปยังหน้าคำนวณ
         function showCalculator() {
-            // เคลียร์ข้อมูลการค้นหาทุกครั้งก่อนไปหน้าคำนวณ
-            document.getElementById("searchInput").value = ""; // เคลียร์ช่อง input
-            document.getElementById("result").innerHTML = ""; // เคลียร์ผลลัพธ์การค้นหา
-
-            // ซ่อนหน้าค้นหาธาตุและแสดงหน้าคำนวณ
             document.getElementById("searchSection").style.display = "none";
             document.getElementById("calculatorSection").style.display = "block";
         }
 
-        // ฟังก์ชั่นกลับไปที่หน้าค้นหาธาตุ
+        // ฟังก์ชั่นกลับไปหน้าค้นหา
         function goBack() {
-            // เคลียร์ข้อมูลทุกอย่างในหน้าคำนวณ
-            document.getElementById("searchInput").value = ""; // เคลียร์ช่อง input
-            document.getElementById("result").innerHTML = ""; // เคลียร์ผลลัพธ์การค้นหา
-
-            // ซ่อนหน้าคำนวณและแสดงหน้าค้นหาธาตุ
             document.getElementById("calculatorSection").style.display = "none";
             document.getElementById("searchSection").style.display = "block";
         }
 
-        // แสดงหน้าค้นหาธาตุเป็นค่าเริ่มต้น
-        window.onload = function() {
-            document.getElementById("searchSection").style.display = "block";
-            document.getElementById("calculatorSection").style.display = "none";
-        }
+        // แสดงหน้าค้นหาเริ่มต้น
+        document.getElementById("searchSection").style.display = "block";
     </script>
+</body>
+</html>
+
 </body>
 </html>
