@@ -134,11 +134,9 @@
             { name: "Oganesson", symbol: "Og",grop:"8A",atomicNumber:118, atomicWeight:294, density:13.65, meltingPoint:"ไม่มี", boilingPoint:"ไม่มี"},
         ];
         // ฟังก์ชั่นค้นหาธาตุ  
-        function searchElement() {
-            const query = document.getElementById("searchInput").value.trim().toLowerCase();
-            const resultDiv = document.getElementById("result");
-            resultDiv.innerHTML = ""; 
-
+        const filteredElements = elements.filter(element => 
+    element.name.toLowerCase().includes(query) || element.symbol.toLowerCase().includes(query)
+);
             // ตรวจสอบว่า query มีข้อมูลหรือไม่
             if (query === "") {
                 return; // ถ้าไม่มีคำค้นหาจะไม่แสดงผลลัพธ์
